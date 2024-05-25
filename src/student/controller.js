@@ -42,4 +42,29 @@ const deleteStudentById = (req, res) => {
       })
 }
 
-export default { getStudents, getStudentById, addStudent, deleteStudentById, };
+const updateStudent = (req, res) => {
+      const id = parseInt(req.params.id);
+      const { name } = req.body;
+      db.query(queries.getStudentById, [id], (error, result) => {
+            if (error) {
+                  console.error("Error checking student existence:", error);
+                  return res.status(500).send("Error checking student existence");
+            }
+
+            const noStudentFound = result.rows.length === 0;
+            if (noStudentFound) {
+                  return res.status(404).send("Student does not exist in the database");
+            }
+
+            db.query(queries.updateStudent, [name, id], (error, result) => {
+                  if (error) {
+                        console.error("Error updating student:", error);
+                        return res.status(500).send("Error updating student");
+                  }
+
+                  res.status(200).send("Student updated successfully");
+            })
+      })
+}
+
+export default { getStudents, getStudentById, addStudent, deleteStudentById, updateStudent };
